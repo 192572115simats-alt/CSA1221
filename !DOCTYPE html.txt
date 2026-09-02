@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design and Performance Analysis of a Pipelined Processor with a Multi-Level Cache Memory System</title>
+  <meta name="description" content="Futuristic Computer Architecture Simulation Platform - Interactive 5-Stage CPU Pipeline, Multi-Level Cache Hierarchy (L1/L2/L3), Hazard Detection, Dynamic Forwarding, AMAT & Performance Analytics.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Modular CSS Suite -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/landing.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/pipeline.css">
+  <link rel="stylesheet" href="css/cache.css">
+  <link rel="stylesheet" href="css/analytics.css">
+  <link rel="stylesheet" href="css/experiments.css">
+  <link rel="stylesheet" href="css/architecture.css">
+</head>
+<body>
+
+  <!-- Background Animated Circuit Canvas -->
+  <canvas id="circuit-bg-canvas"></canvas>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="top-navbar">
+    <div class="brand-section" data-target-view="landing">
+      <div class="brand-logo-icon">⚡</div>
+      <div>
+        <div class="brand-title">CPU ARCH LAB</div>
+        <div class="brand-subtitle">5-STAGE PIPELINE &bull; L1/L2/L3 CACHE</div>
+      </div>
+    </div>
+
+    <!-- Master Simulation Controls HUD -->
+    <div class="top-controls" style="display: none;">
+      <div class="hud-pill">
+        <span class="status-indicator" id="hud-status-dot"></span>
+        <span class="label">STATUS:</span>
+        <span class="val" id="hud-sim-status">READY</span>
+      </div>
+      <div class="hud-pill">
+        <span class="label">CLOCK:</span>
+        <span class="val" id="hud-clock-cycle">Cycle 0 / 0</span>
+      </div>
+      <div class="hud-pill">
+        <span class="label">SPEED:</span>
+        <input type="range" id="sim-speed-slider" min="0.2" max="3.0" step="0.2" value="1.0" style="width: 70px; cursor: pointer;">
+        <span class="val" id="speed-val-display">1.0x</span>
+      </div>
+      <div class="control-btn-group">
+        <button class="btn-cyber btn-icon-only" id="btn-run-simulation" title="Run / Pause Simulation (Space)">▶ RUN</button>
+        <button class="btn-cyber btn-icon-only" id="btn-step-simulation" title="Step One Cycle (S)">⏭ STEP</button>
+        <button class="btn-cyber btn-cyber-amber btn-icon-only" id="btn-reset-simulation" title="Reset (R)">↺ RESET</button>
+      </div>
+    </div>
+
+    <!-- Right User Controls -->
+    <div class="top-user-actions">
+      <button class="btn-cyber btn-icon-only sound-toggle-btn" id="btn-toggle-sound" title="Toggle Futuristic Audio">🔊</button>
+      <button class="btn-cyber btn-icon-only" id="btn-toggle-theme" title="Toggle Theme">🌙</button>
+      <button class="btn-cyber btn-icon-only" id="btn-toggle-sidebar" title="Toggle Sidebar">☰</button>
+    </div>
+  </header>
+
+  <!-- APP ROOT WRAPPER -->
+  <div id="app-root">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="nav-category">Navigation</div>
+        <ul class="nav-menu">
+          <li class="nav-item" data-target-view="landing">
+            <span class="nav-icon">🚀</span>
+            <span class="nav-text">Home / Landing</span>
+          </li>
+          <li class="nav-item" data-target-view="dashboard">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">Dashboard</span>
+            <span class="cyber-badge badge-cyan nav-badge">HUD</span>
+          </li>
+          <li class="nav-item" data-target-view="pipeline">
+            <span class="nav-icon">⚙</span>
+            <span class="nav-text">Pipeline Simulator</span>
+            <span class="cyber-badge badge-purple nav-badge">5-Stage</span>
+          </li>
+          <li class="nav-item" data-target-view="cache">
+            <span class="nav-icon">🧠</span>
+            <span class="nav-text">Cache Memory</span>
+            <span class="cyber-badge badge-emerald nav-badge">L1/L2/L3</span>
+          </li>
+          <li class="nav-item" data-target-view="analytics">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Performance Analytics</span>
+          </li>
+          <li class="nav-item" data-target-view="experiments">
+            <span class="nav-icon">🔬</span>
+            <span class="nav-text">Experiment Lab</span>
+          </li>
+          <li class="nav-item" data-target-view="comparison">
+            <span class="nav-icon">📈</span>
+            <span class="nav-text">Comparison Matrix</span>
+          </li>
+          <li class="nav-item" data-target-view="architecture">
+            <span class="nav-icon">📚</span>
+            <span class="nav-text">Architecture Guide</span>
+          </li>
+          <li class="nav-item" data-target-view="results">
+            <span class="nav-icon">📄</span>
+            <span class="nav-text">Results & Export</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
+          <div>Antigravity Architecture v2.4</div>
+          <div style="color:var(--cyber-cyan); font-family:var(--font-mono); margin-top:2px;">SYS_OK &bull; 2.50 GHz</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT VIEW ROUTER -->
+    <main class="main-content">
+
+      <!-- ================================================================= -->
+      <!-- VIEW 1: LANDING PAGE -->
+      <!-- ================================================================= -->
+      <section id="view-landing" class="app-view active">
+        <div class="landing-container">
+          
+          <div class="hero-wrapper">
+            <div class="hero-content">
+              <div class="hero-tag">⚡ NEXT-GEN COMPUTER ARCHITECTURE SIMULATOR</div>
+              <h1 class="hero-title">PIPELINED PROCESSOR PERFORMANCE LAB</h1>
+              <p class="hero-subtitle">
+                Design, simulate, and analyze the performance of a modern pipelined processor integrated with a multi-level cache memory hierarchy (L1/L2/L3). Explore cycle-accurate hazard detection, forwarding paths, AMAT mathematical modeling, and research benchmarking.
+              </p>
+              <div class="hero-actions">
+                <button class="btn-cyber" data-target-view="dashboard">⚡ START SIMULATION</button>
+                <button class="btn-cyber btn-cyber-purple" data-target-view="architecture">🔍 EXPLORE ARCHITECTURE</button>
+              </div>
+            </div>
+
+            <!-- Animated CPU Silicon Chip Visual -->
+            <div class="hero-visual">
+              <div class="cpu-chip-graphic">
+                <div class="chip-die">
+                  <div class="die-core">CORE 0<br><span style="font-size:0.5rem;color:#fff;">ACTIVE</span></div>
+                  <div class="die-core">L1 I/D<br><span style="font-size:0.5rem;color:#34d399;">32KB</span></div>
+                  <div class="die-core">L2 UNIFIED<br><span style="font-size:0.5rem;color:#c084fc;">256KB</span></div>
+                  <div class="die-core">L3 CACHE<br><span style="font-size:0.5rem;color:#fbbf24;">2MB</span></div>
+                </div>
+                <div class="chip-label">QUANTUM-X ARCHITECTURE</div>
+              </div>
+
+              <!-- Floating Orbit Nodes -->
+              <div class="orbit-node node-1">⚡ IF : Fetch</div>
+              <div class="orbit-node node-2">🧠 EX : Compute</div>
+              <div class="orbit-node node-3">💾 MEM : L1/L2/L3</div>
+              <div class="orbit-node node-4">🎯 WB : Commit</div>
+            </div>
+          </div>
+
+          <!-- Animated Statistics Ribbon -->
+          <div class="stats-ribbon">
+            <div class="stat-card glass-panel cyber-corner-box">
+              <div class="stat-icon">⚡</div>
+              <div class="stat-info">
+                <span class="stat-val">5 STAGES</span>
+                <span class="stat-lbl">IF &bull; ID &bull; EX &bull; MEM &bull; WB</span>
+              </div>
+            </div>
+            <div class="stat-card glass-panel cyber-corner-box">
+              <div class="stat-icon">🧠</div>
+              <div class="stat-info">
+                <span class="stat-val">3 LEVELS</span>
+                <span class="stat-lbl">L1 / L2 / L3 Cache Hierarchy</span>
+              </div>
+            </div>
+            <div class="stat-card glass-panel cyber-corner-box">
+              <div class="stat-icon">🚀</div>
+              <div class="stat-info">
+                <span class="stat-val">REAL-TIME</span>
+                <span class="stat-lbl">Cycle-Accurate Hazards</span>
+              </div>
+            </div>
+            <div class="stat-card glass-panel cyber-corner-box">
+              <div class="stat-icon">📊</div>
+              <div class="stat-info">
+                <span class="stat-val">ANALYTICS</span>
+                <span class="stat-lbl">CPI, Speedup, AMAT, Latency</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Cards Grid -->
+          <div class="landing-features">
+            <div class="feature-card glass-panel">
+              <div class="feature-header">
+                <span style="font-size:1.4rem;">⚙</span>
+                <h3 class="feature-title">5-Stage Pipeline Simulation</h3>
+              </div>
+              <p class="feature-desc">
+                Execute cycle-by-cycle instruction progression with dynamic RAW data hazard detection, Load-Use stall insertion, branch prediction, and operand forwarding paths.
+              </p>
+            </div>
+            <div class="feature-card glass-panel">
+              <div class="feature-header">
+                <span style="font-size:1.4rem;">💾</span>
+                <h3 class="feature-title">Hierarchical Cache Engine</h3>
+              </div>
+              <p class="feature-desc">
+                Simulate multi-level memory access across L1, L2, L3, and DRAM with Tag/Index/Offset address decoding, LRU/FIFO replacement, and animated bus transfers.
+              </p>
+            </div>
+            <div class="feature-card glass-panel">
+              <div class="feature-header">
+                <span style="font-size:1.4rem;">📈</span>
+                <h3 class="feature-title">Research-Grade Analytics</h3>
+              </div>
+              <p class="feature-desc">
+                Generate parameter sweep curves, comparative speedup benchmarks, AMAT mathematical formulas, and export comprehensive PDF and CSV technical reports.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 2: DASHBOARD OVERVIEW -->
+      <!-- ================================================================= -->
+      <section id="view-dashboard" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>PROCESSOR SIMULATION DASHBOARD</h2>
+            <p>Live telemetry HUD, microarchitecture status, and simulation controller.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-cyber" data-target-view="pipeline">OPEN PIPELINE</button>
+            <button class="btn-cyber btn-cyber-emerald" data-target-view="cache">OPEN CACHE</button>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- KPI Summary Banner -->
+          <div class="col-span-12">
+            <div class="kpi-grid">
+              <div class="kpi-card glass-panel">
+                <div class="kpi-header">
+                  <span class="kpi-title">Clock Cycles</span>
+                  <span class="kpi-icon">⚡</span>
+                </div>
+                <div class="kpi-value" id="kpi-cycles-val">15</div>
+                <div class="kpi-subtext">Total elapsed cycles</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-purple">
+                <div class="kpi-header">
+                  <span class="kpi-title">Instructions</span>
+                  <span class="kpi-icon">🚀</span>
+                </div>
+                <div class="kpi-value" id="kpi-instructions-val">11</div>
+                <div class="kpi-subtext">Executed & committed</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-emerald">
+                <div class="kpi-header">
+                  <span class="kpi-title">CPI</span>
+                  <span class="kpi-icon">📊</span>
+                </div>
+                <div class="kpi-value" id="kpi-cpi-val">1.36</div>
+                <div class="kpi-subtext">Cycles Per Instruction</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-amber">
+                <div class="kpi-header">
+                  <span class="kpi-title">Execution Time</span>
+                  <span class="kpi-icon">⏱</span>
+                </div>
+                <div class="kpi-value" id="kpi-exec-time-val">6.0 ns</div>
+                <div class="kpi-subtext">@ 2.50 GHz Clock</div>
+              </div>
+              <div class="kpi-card glass-panel">
+                <div class="kpi-header">
+                  <span class="kpi-title">Pipeline Speedup</span>
+                  <span class="kpi-icon">🔥</span>
+                </div>
+                <div class="kpi-value" id="kpi-speedup-val" style="color:var(--cyber-cyan);">3.67x</div>
+                <div class="kpi-subtext">vs Non-Pipelined CPU</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-crimson">
+                <div class="kpi-header">
+                  <span class="kpi-title">Pipeline Stalls</span>
+                  <span class="kpi-icon">⚠</span>
+                </div>
+                <div class="kpi-value" id="kpi-stalls-val">1</div>
+                <div class="kpi-subtext">Hazard penalty bubbles</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-emerald">
+                <div class="kpi-header">
+                  <span class="kpi-title">Throughput</span>
+                  <span class="kpi-icon">📈</span>
+                </div>
+                <div class="kpi-value" id="kpi-throughput-val" style="color:#34d399;">1833 MIPS</div>
+                <div class="kpi-subtext">Million Instructions/sec</div>
+              </div>
+              <div class="kpi-card glass-panel kpi-purple">
+                <div class="kpi-header">
+                  <span class="kpi-title">Efficiency</span>
+                  <span class="kpi-icon">🎯</span>
+                </div>
+                <div class="kpi-value" id="kpi-efficiency-val">73.4%</div>
+                <div class="kpi-subtext">Hardware utilization</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Pipeline Stage Visual -->
+          <div class="col-span-8">
+            <div class="glass-panel" style="padding:24px;">
+              <h3 style="font-size:1.1rem; margin-bottom:14px; color:var(--cyber-cyan);">⚡ ACTIVE 5-STAGE CPU PIPELINE</h3>
+              <div class="pipeline-chain-container" style="margin-bottom:0;">
+                <div class="stage-node node-if" id="stage-node-if">
+                  <div class="stage-header"><span class="stage-badge-name">IF</span><span class="stage-status-dot"></span></div>
+                  <div class="stage-instruction-box">-- IDLE --</div>
+                </div>
+                <span class="stage-connector-arrow">&rarr;</span>
+                <div class="stage-node node-id" id="stage-node-id">
+                  <div class="stage-header"><span class="stage-badge-name">ID</span><span class="stage-status-dot"></span></div>
+                  <div class="stage-instruction-box">-- IDLE --</div>
+                </div>
+                <span class="stage-connector-arrow">&rarr;</span>
+                <div class="stage-node node-ex" id="stage-node-ex">
+                  <div class="stage-header"><span class="stage-badge-name">EX</span><span class="stage-status-dot"></span></div>
+                  <div class="stage-instruction-box">-- IDLE --</div>
+                </div>
+                <span class="stage-connector-arrow">&rarr;</span>
+                <div class="stage-node node-mem" id="stage-node-mem">
+                  <div class="stage-header"><span class="stage-badge-name">MEM</span><span class="stage-status-dot"></span></div>
+                  <div class="stage-instruction-box">-- IDLE --</div>
+                </div>
+                <span class="stage-connector-arrow">&rarr;</span>
+                <div class="stage-node node-wb" id="stage-node-wb">
+                  <div class="stage-header"><span class="stage-badge-name">WB</span><span class="stage-status-dot"></span></div>
+                  <div class="stage-instruction-box">-- IDLE --</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cache Hierarchy Pulse Widget -->
+          <div class="col-span-4">
+            <div class="glass-panel" style="padding:24px; display:flex; flex-direction:column; gap:12px;">
+              <h3 style="font-size:1.1rem; color:#34d399;">🧠 CACHE HIERARCHY HEALTH</h3>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(0,0,0,0.3); border-radius:6px;">
+                <span>L1 Cache Hit Rate</span>
+                <strong style="color:var(--cyber-cyan);" id="dash-l1-hit">88.5%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(0,0,0,0.3); border-radius:6px;">
+                <span>L2 Cache Hit Rate</span>
+                <strong style="color:#818cf8;">75.0%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(0,0,0,0.3); border-radius:6px;">
+                <span>L3 Cache Hit Rate</span>
+                <strong style="color:#c084fc;">80.0%</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); border-radius:6px;">
+                <span>Global AMAT</span>
+                <strong style="color:#34d399;">2.15 cycles</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 3: PIPELINE SIMULATOR -->
+      <!-- ================================================================= -->
+      <section id="view-pipeline" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 1: PIPELINED PROCESSOR SIMULATOR</h2>
+            <p>5-Stage Instruction Execution Datapath with Dynamic Hazard Detection & Forwarding.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-cyber" id="btn-generate-instructions">⚡ LOAD SAMPLE PROGRAM</button>
+          </div>
+        </div>
+
+        <!-- Hazard Alert Overlay Banner -->
+        <div id="hazard-alert-container" class="hazard-alert-banner" style="display:none;"></div>
+
+        <!-- Connected 5-Stage Visualizer -->
+        <div class="pipeline-chain-container">
+          <div class="stage-node node-if">
+            <div class="stage-header">
+              <span class="stage-badge-name">1. IF &bull; Fetch</span>
+              <span class="stage-status-dot"></span>
+            </div>
+            <div class="stage-instruction-box">-- IDLE --</div>
+          </div>
+          <span class="stage-connector-arrow">&rarr;</span>
+          <div class="stage-node node-id">
+            <div class="stage-header">
+              <span class="stage-badge-name">2. ID &bull; Decode</span>
+              <span class="stage-status-dot"></span>
+            </div>
+            <div class="stage-instruction-box">-- IDLE --</div>
+          </div>
+          <span class="stage-connector-arrow">&rarr;</span>
+          <div class="stage-node node-ex">
+            <div class="stage-header">
+              <span class="stage-badge-name">3. EX &bull; Execute</span>
+              <span class="stage-status-dot"></span>
+            </div>
+            <div class="stage-instruction-box">-- IDLE --</div>
+          </div>
+          <span class="stage-connector-arrow">&rarr;</span>
+          <div class="stage-node node-mem">
+            <div class="stage-header">
+              <span class="stage-badge-name">4. MEM &bull; Memory</span>
+              <span class="stage-status-dot"></span>
+            </div>
+            <div class="stage-instruction-box">-- IDLE --</div>
+          </div>
+          <span class="stage-connector-arrow">&rarr;</span>
+          <div class="stage-node node-wb">
+            <div class="stage-header">
+              <span class="stage-badge-name">5. WB &bull; Writeback</span>
+              <span class="stage-status-dot"></span>
+            </div>
+            <div class="stage-instruction-box">-- IDLE --</div>
+          </div>
+        </div>
+
+        <!-- Two Column Control & Register Inspector -->
+        <div class="grid-2" style="margin-bottom:24px;">
+          <!-- Left: Instruction Assembly Editor -->
+          <div class="glass-panel" style="padding:22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <label class="cyber-label" style="margin-bottom:0;">Instruction Stream (Assembly)</label>
+              <span class="cyber-badge badge-cyan">MIPS-Style RISC</span>
+            </div>
+            <textarea id="pipeline-instruction-editor" class="cyber-textarea instruction-editor-area" spellcheck="false">
+LOAD R1, 100
+LOAD R2, 104
+ADD R3, R1, R2
+SUB R4, R3, R1
+STORE R4, 200
+AND R5, R3, R4
+OR R6, R5, R2
+SLT R7, R6, R1
+BEQ R7, R0, 2
+ADD R8, R7, R3
+STORE R8, 204</textarea>
+            
+            <div class="sample-preset-pills">
+              <button class="btn-cyber btn-icon-only preset-btn" data-preset="fibonacci">Fibonacci Series</button>
+              <button class="btn-cyber btn-cyber-amber btn-icon-only preset-btn" data-preset="hazards">RAW Hazards Test</button>
+              <button class="btn-cyber btn-cyber-crimson btn-icon-only preset-btn" data-preset="load_use">Load-Use Stalls</button>
+              <button class="btn-cyber btn-cyber-purple btn-icon-only preset-btn" data-preset="branch">Branch Loop</button>
+            </div>
+
+            <div style="display:flex; gap:16px; margin-top:16px; align-items:center; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.82rem; font-family:var(--font-mono);">
+                <input type="checkbox" id="toggle-forwarding" checked>
+                <span>Forwarding Unit</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.82rem; font-family:var(--font-mono);">
+                <input type="checkbox" id="toggle-hazard-unit" checked>
+                <span>Hazard Detection</span>
+              </label>
+              <div style="display:flex; align-items:center; gap:6px; font-size:0.82rem; font-family:var(--font-mono);">
+                <span>Branch:</span>
+                <select id="select-branch-prediction" class="cyber-select" style="padding:4px 8px; width:auto; font-size:0.75rem;">
+                  <option value="2bit_dynamic">2-Bit Saturating Counter</option>
+                  <option value="always_taken">Always Taken</option>
+                  <option value="always_not_taken">Always Not Taken</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Register File & Memory Inspector -->
+          <div class="glass-panel" style="padding:22px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <label class="cyber-label" style="margin-bottom:0;">Register File (R0 &ndash; R15)</label>
+              <span class="cyber-badge badge-emerald">32-Bit GPRs</span>
+            </div>
+            <div class="register-grid" id="register-file-grid">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Gantt Chart Timeline -->
+        <div class="glass-panel timeline-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-size:1.1rem; color:var(--cyber-cyan);">📊 PIPELINE TIMELINE VISUALIZATION (GANTT CHART)</h3>
+            <div style="display:flex; gap:10px; font-size:0.75rem; font-family:var(--font-mono);">
+              <span class="stage-pill pill-if">IF</span>
+              <span class="stage-pill pill-id">ID</span>
+              <span class="stage-pill pill-ex">EX</span>
+              <span class="stage-pill pill-mem">MEM</span>
+              <span class="stage-pill pill-wb">WB</span>
+              <span class="stage-pill pill-stall">STALL</span>
+            </div>
+          </div>
+          <div class="timeline-table-wrapper" id="pipeline-gantt-container">
+            <!-- Rendered by gantt_chart.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 4: CACHE MEMORY SIMULATOR -->
+      <!-- ================================================================= -->
+      <section id="view-cache" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 2: MULTI-LEVEL CACHE MEMORY SYSTEM</h2>
+            <p>Hierarchical L1 (I/D), L2, L3 cache simulation with tag/index decoding and AMAT analytics.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-cyber" id="btn-run-cache-sim">⚡ SIMULATE ACCESS TRACE</button>
+            <button class="btn-cyber btn-cyber-purple" id="btn-step-cache-trace">⏭ STEP ACCESS</button>
+          </div>
+        </div>
+
+        <!-- 32-Bit Address Decomposition Card -->
+        <div class="glass-panel address-breakdown-card" style="margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="cyber-label" style="margin-bottom:0;">Memory Address Decomposition (32-Bit Physical Address)</label>
+            <span class="cyber-badge badge-cyan">Tag / Index / Offset</span>
+          </div>
+
+          <div class="address-bits-display">
+            <div class="bit-chunk bit-tag">
+              <span class="bit-label" style="color:#0ea5e9;">TAG BITS (19 BITS)</span>
+              <span class="bit-binary" id="bit-tag-bin">0000000000000000000</span>
+              <span class="bit-hex" id="bit-tag-hex">0x0000</span>
+            </div>
+            <div class="bit-chunk bit-index">
+              <span class="bit-label" style="color:#c084fc;">INDEX BITS (7 BITS)</span>
+              <span class="bit-binary" id="bit-index-bin">0000001</span>
+              <span class="bit-hex" id="bit-index-dec">Set 1</span>
+            </div>
+            <div class="bit-chunk bit-offset">
+              <span class="bit-label" style="color:#fbbf24;">OFFSET (6 BITS)</span>
+              <span class="bit-binary" id="bit-offset-bin">100100</span>
+              <span class="bit-hex" id="bit-offset-dec">Byte 36</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom:24px;">
+          <!-- Left: Hierarchy Visualizer -->
+          <div class="glass-panel cache-hierarchy-container">
+            <div class="hierarchy-node node-cpu" id="cache-node-cpu">
+              <div class="hierarchy-label-group">
+                <div class="hierarchy-title">CPU CORE</div>
+                <div class="hierarchy-sub">Instruction Fetch & Memory Stage</div>
+              </div>
+              <div class="cyber-badge badge-cyan">MASTER</div>
+            </div>
+
+            <div class="bus-connector"><span class="bus-pulse"></span></div>
+
+            <div class="hierarchy-node node-l1" id="cache-node-l1">
+              <div class="hierarchy-label-group">
+                <div class="hierarchy-title">L1 CACHE (32 KB)</div>
+                <div class="hierarchy-sub">Separate I/D &bull; 4-Way Set Associative &bull; 64B Line</div>
+              </div>
+              <div class="hierarchy-metrics">
+                <div class="h-metric">
+                  <span class="h-metric-val" id="l1-hit-rate-val">88.5%</span>
+                  <span class="h-metric-lbl">Hit Rate</span>
+                </div>
+                <div class="h-metric">
+                  <span class="h-metric-val">2 cyc</span>
+                  <span class="h-metric-lbl">Latency</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bus-connector"><span class="bus-pulse"></span></div>
+
+            <div class="hierarchy-node node-l2" id="cache-node-l2">
+              <div class="hierarchy-label-group">
+                <div class="hierarchy-title">L2 UNIFIED CACHE (256 KB)</div>
+                <div class="hierarchy-sub">8-Way Set Associative &bull; 64B Line</div>
+              </div>
+              <div class="hierarchy-metrics">
+                <div class="h-metric">
+                  <span class="h-metric-val" id="l2-hit-rate-val">75.0%</span>
+                  <span class="h-metric-lbl">Hit Rate</span>
+                </div>
+                <div class="h-metric">
+                  <span class="h-metric-val">10 cyc</span>
+                  <span class="h-metric-lbl">Latency</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bus-connector"><span class="bus-pulse"></span></div>
+
+            <div class="hierarchy-node node-l3" id="cache-node-l3">
+              <div class="hierarchy-label-group">
+                <div class="hierarchy-title">L3 LAST-LEVEL CACHE (2 MB)</div>
+                <div class="hierarchy-sub">16-Way Set Associative &bull; 64B Line</div>
+              </div>
+              <div class="hierarchy-metrics">
+                <div class="h-metric">
+                  <span class="h-metric-val" id="l3-hit-rate-val">80.0%</span>
+                  <span class="h-metric-lbl">Hit Rate</span>
+                </div>
+                <div class="h-metric">
+                  <span class="h-metric-val">35 cyc</span>
+                  <span class="h-metric-lbl">Latency</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bus-connector"><span class="bus-pulse"></span></div>
+
+            <div class="hierarchy-node node-dram" id="cache-node-dram">
+              <div class="hierarchy-label-group">
+                <div class="hierarchy-title">MAIN MEMORY (DRAM)</div>
+                <div class="hierarchy-sub">DDR5 System RAM Interface</div>
+              </div>
+              <div class="hierarchy-metrics">
+                <div class="h-metric">
+                  <span class="h-metric-val" style="color:#f43f5e;">150 cyc</span>
+                  <span class="h-metric-lbl">Miss Penalty</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Configuration & AMAT Card -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Cache Configuration Form -->
+            <div class="glass-panel" style="padding:22px;">
+              <h3 style="font-size:1.05rem; margin-bottom:14px; color:var(--cyber-cyan);">CACHE CONFIGURATION</h3>
+              
+              <div class="grid-2" style="gap:12px; margin-bottom:12px;">
+                <div>
+                  <label class="cyber-label">L1 Size (KB)</label>
+                  <select id="cfg-l1-size" class="cyber-select">
+                    <option value="16">16 KB</option>
+                    <option value="32" selected>32 KB</option>
+                    <option value="64">64 KB</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="cyber-label">L1 Associativity</label>
+                  <select id="cfg-l1-assoc" class="cyber-select">
+                    <option value="1">Direct Mapped (1-Way)</option>
+                    <option value="2">2-Way Set Associative</option>
+                    <option value="4" selected>4-Way Set Associative</option>
+                    <option value="8">8-Way Set Associative</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="cyber-label">L2 Size (KB)</label>
+                  <select id="cfg-l2-size" class="cyber-select">
+                    <option value="128">128 KB</option>
+                    <option value="256" selected>256 KB</option>
+                    <option value="512">512 KB</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="cyber-label">L3 Size (KB)</label>
+                  <select id="cfg-l3-size" class="cyber-select">
+                    <option value="1024">1 MB</option>
+                    <option value="2048" selected>2 MB</option>
+                    <option value="4096">4 MB</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <label class="cyber-label">Replacement Policy</label>
+                <select id="cfg-replacement-policy" class="cyber-select">
+                  <option value="LRU" selected>LRU (Least Recently Used)</option>
+                  <option value="FIFO">FIFO (First-In, First-Out)</option>
+                  <option value="RANDOM">Random Replacement</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="cyber-label">Memory Access Addresses</label>
+                <input type="text" id="cache-address-input" class="cyber-input" value="100, 104, 108, 200, 100, 300, 104, 512, 100, 200">
+                <div class="sample-preset-pills" style="margin-top:8px;">
+                  <button class="btn-cyber btn-icon-only addr-preset-btn" data-pattern="spatial">Spatial Locality</button>
+                  <button class="btn-cyber btn-cyber-purple btn-icon-only addr-preset-btn" data-pattern="temporal">Temporal Locality</button>
+                  <button class="btn-cyber btn-cyber-crimson btn-icon-only addr-preset-btn" data-pattern="thrashing">Conflict Thrashing</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- AMAT Dynamic Formula Box -->
+            <div class="amat-formula-box">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="color:var(--cyber-cyan); font-size:0.95rem;">AMAT (Average Memory Access Time)</h4>
+                <span class="cyber-badge badge-emerald" id="amat-metric-val">2.15 cycles</span>
+              </div>
+              <div class="formula-tex">
+                AMAT = T_L1 + MR_L1 &times; (T_L2 + MR_L2 &times; (T_L3 + MR_L3 &times; T_DRAM))
+              </div>
+              <div class="formula-substitutions" id="amat-formula-substitutions">
+                <div>&bull; Step 1: L3 Penalty = 35 + (0.20 &times; 150) = <strong>65.0 cycles</strong></div>
+                <div>&bull; Step 2: L2 Penalty = 10 + (0.25 &times; 65.0) = <strong>26.25 cycles</strong></div>
+                <div>&bull; Step 3: AMAT = 2 + (0.115 &times; 26.25) = <strong style="color:var(--cyber-emerald)">2.15 cycles</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cache Lines Inspector Table -->
+        <div class="glass-panel" style="padding:22px;">
+          <h3 style="font-size:1.05rem; margin-bottom:14px; color:var(--cyber-cyan);">L1 CACHE SETS & LINES INSPECTOR</h3>
+          <div style="overflow-x:auto;">
+            <table class="cache-lines-table">
+              <thead>
+                <tr>
+                  <th>Set Index</th>
+                  <th>Way</th>
+                  <th>Valid Bit</th>
+                  <th>Dirty Bit</th>
+                  <th>Tag (Hex)</th>
+                </tr>
+              </thead>
+              <tbody id="cache-lines-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 5: PERFORMANCE ANALYTICS -->
+      <!-- ================================================================= -->
+      <section id="view-analytics" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 3: PERFORMANCE ANALYTICS & CHARTS</h2>
+            <p>Comprehensive analytical curves, CPI scaling, speedup efficiency, and multi-factor radar charts.</p>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <div class="chart-card glass-panel">
+            <div class="chart-card-header">
+              <h3 class="chart-title">1. CPI vs Instruction Count</h3>
+              <span class="cyber-badge badge-cyan">Ideal &rarr; 1.0</span>
+            </div>
+            <div class="chart-canvas-wrapper">
+              <canvas id="chart-cpi-instructions"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card glass-panel">
+            <div class="chart-card-header">
+              <h3 class="chart-title">2. Speedup vs Pipeline Stages (Depth)</h3>
+              <span class="cyber-badge badge-emerald">Hazard Overheads</span>
+            </div>
+            <div class="chart-canvas-wrapper">
+              <canvas id="chart-speedup-stages"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card glass-panel">
+            <div class="chart-card-header">
+              <h3 class="chart-title">3. Cache Hit Rate vs Cache Size</h3>
+              <span class="cyber-badge badge-purple">4KB &ndash; 512KB</span>
+            </div>
+            <div class="chart-canvas-wrapper">
+              <canvas id="chart-cache-hit-size"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card glass-panel">
+            <div class="chart-card-header">
+              <h3 class="chart-title">4. Pipeline Stalls Breakdown</h3>
+              <span class="cyber-badge badge-crimson">Hazard Taxonomy</span>
+            </div>
+            <div class="chart-canvas-wrapper">
+              <canvas id="chart-stalls-breakdown"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Radar Chart Full Width -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:28px;">
+          <h3 style="font-size:1.1rem; color:var(--cyber-cyan); margin-bottom:16px;">5. Multi-Factor Microarchitecture Comparison (Radar)</h3>
+          <div style="height:320px; position:relative;">
+            <canvas id="chart-radar-comparison"></canvas>
+          </div>
+        </div>
+
+        <!-- Performance Formulas Section -->
+        <div class="glass-panel" style="padding:24px;">
+          <h3 style="font-size:1.1rem; color:var(--cyber-cyan); margin-bottom:16px;">MATHEMATICAL FORMULATION SUITE</h3>
+          <div class="formulas-grid">
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Cycles Per Instruction (CPI)</div>
+              <div class="formula-equation">CPI = Total Cycles / Instruction Count</div>
+              <div class="formula-meaning">Reflects average execution cycles per instruction. Ideal pipelined CPI approaches 1.0.</div>
+            </div>
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Execution Time</div>
+              <div class="formula-equation">T_exec = IC &times; CPI &times; T_clock</div>
+              <div class="formula-meaning">Total program execution wall-clock time in nanoseconds.</div>
+            </div>
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Speedup Factor</div>
+              <div class="formula-equation">Speedup = T_non_pipelined / T_pipelined</div>
+              <div class="formula-meaning">Performance gain of pipelining over single-cycle execution. Bound by stage count k.</div>
+            </div>
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Pipeline Efficiency</div>
+              <div class="formula-equation">Efficiency = (Speedup / k) &times; 100%</div>
+              <div class="formula-meaning">Measures hardware utilization efficiency across all k stages.</div>
+            </div>
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Cache Hit Rate</div>
+              <div class="formula-equation">Hit Rate = Hits / Total Memory Accesses</div>
+              <div class="formula-meaning">Percentage of memory requests resolved in cache without higher-level penalty.</div>
+            </div>
+            <div class="formula-card glass-panel">
+              <div class="formula-name">Average Memory Access Time</div>
+              <div class="formula-equation">AMAT = T_L1 + M_L1 &times; (T_L2 + M_L2 &times; T_pen)</div>
+              <div class="formula-meaning">Effective average cycles required for memory read/write across all levels.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 6: EXPERIMENT LAB -->
+      <!-- ================================================================= -->
+      <section id="view-experiments" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 4: EXPERIMENT LAB & PARAMETER SWEEP</h2>
+            <p>Run parametric microarchitecture sweeps and industry-standard synthetic benchmarks.</p>
+          </div>
+        </div>
+
+        <div class="experiment-workbench">
+          <!-- Left: Parameter Form -->
+          <div class="glass-panel experiment-form">
+            <h3 style="font-size:1.1rem; color:var(--cyber-cyan);">EXPERIMENT WORKBENCH</h3>
+
+            <div>
+              <label class="cyber-label">Experiment Name</label>
+              <input type="text" id="exp-name-input" class="cyber-input" value="Parameter Sweep Run #1">
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div>
+                <label class="cyber-label">Instruction Count</label>
+                <input type="number" id="exp-inst-count" class="cyber-input" value="30" min="5" max="200">
+              </div>
+              <div>
+                <label class="cyber-label">Pipeline Stages</label>
+                <select id="exp-stages-select" class="cyber-select">
+                  <option value="3">3-Stage (IF, EX, WB)</option>
+                  <option value="5" selected>5-Stage (Classic RISC)</option>
+                  <option value="7">7-Stage Deep Pipeline</option>
+                  <option value="10">10-Stage Superpipeline</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div>
+                <label class="cyber-label">Clock Freq (GHz)</label>
+                <input type="number" id="exp-freq-input" class="cyber-input" value="2.5" step="0.1">
+              </div>
+              <div>
+                <label class="cyber-label">L1 Cache (KB)</label>
+                <select id="exp-l1-size" class="cyber-select">
+                  <option value="16">16 KB</option>
+                  <option value="32" selected>32 KB</option>
+                  <option value="64">64 KB</option>
+                  <option value="128">128 KB</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-2" style="gap:12px;">
+              <div>
+                <label class="cyber-label">Policy</label>
+                <select id="exp-policy-select" class="cyber-select">
+                  <option value="LRU">LRU</option>
+                  <option value="FIFO">FIFO</option>
+                  <option value="RANDOM">Random</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center; margin-top:20px;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-size:0.82rem; font-family:var(--font-mono);">
+                  <input type="checkbox" id="exp-fwd-checkbox" checked>
+                  <span>Forwarding</span>
+                </label>
+              </div>
+            </div>
+
+            <button class="btn-cyber" id="btn-run-experiment" style="margin-top:10px;">🧪 EXECUTE EXPERIMENT</button>
+
+            <div style="margin-top:16px;">
+              <label class="cyber-label">Or Run Standard Benchmark</label>
+              <div class="sample-preset-pills">
+                <button class="btn-cyber btn-icon-only benchmark-preset-btn" data-benchmark="matrix">Matrix Multiply</button>
+                <button class="btn-cyber btn-cyber-purple btn-icon-only benchmark-preset-btn" data-benchmark="quicksort">QuickSort</button>
+                <button class="btn-cyber btn-cyber-amber btn-icon-only benchmark-preset-btn" data-benchmark="dsp">DSP FIR Filter</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Experiment History List -->
+          <div class="glass-panel" style="padding:22px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem; color:#ffffff;">EXPERIMENT HISTORY & RUN LOG</h3>
+              <span class="cyber-badge badge-emerald">Persisted in SQLite</span>
+            </div>
+            <div class="experiment-history-list" id="experiment-history-container">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 7: COMPARISON SYSTEM -->
+      <!-- ================================================================= -->
+      <section id="view-comparison" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 5: COMPARATIVE ANALYSIS MATRIX</h2>
+            <p>Direct architectural trade-off comparisons across processors and memory hierarchies.</p>
+          </div>
+        </div>
+
+        <!-- Processor Comparison Table -->
+        <div class="glass-panel" style="padding:24px; margin-bottom:28px;">
+          <h3 style="font-size:1.1rem; color:var(--cyber-cyan); margin-bottom:16px;">1. PIPELINED vs NON-PIPELINED PROCESSOR</h3>
+          <div class="comparison-table-wrapper">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>Performance Metric</th>
+                  <th>Non-Pipelined Single-Cycle</th>
+                  <th>Pipelined (No Forwarding / Stalls)</th>
+                  <th>5-Stage Pipelined (Full Forwarding)</th>
+                </tr>
+              </thead>
+              <tbody id="proc-comparison-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Cache Comparison Table -->
+        <div class="glass-panel" style="padding:24px;">
+          <h3 style="font-size:1.1rem; color:#34d399; margin-bottom:16px;">2. CACHE HIERARCHY COMPARISON (Config A vs B vs C)</h3>
+          <div class="comparison-table-wrapper">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Config A: L1 (32KB) + DRAM</th>
+                  <th>Config B: L1 (32KB) + L2 (256KB) + DRAM</th>
+                  <th>Config C: L1 (32KB) + L2 (256KB) + L3 (2MB) + DRAM</th>
+                </tr>
+              </thead>
+              <tbody id="cache-comparison-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 8: ARCHITECTURE GUIDE -->
+      <!-- ================================================================= -->
+      <section id="view-architecture" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 6: INTERACTIVE CPU ARCHITECTURE GUIDE</h2>
+            <p>Click any microarchitectural block to inspect its circuit hardware function, datapath signals, and performance impact.</p>
+          </div>
+        </div>
+
+        <div class="arch-canvas-container">
+          <div class="microarch-diagram">
+            <!-- IF Stage -->
+            <div class="arch-stage-column col-if">
+              <div class="arch-stage-col-header">1. INSTRUCTION FETCH</div>
+              <div class="arch-unit-block" data-component="pc">
+                <span class="unit-icon">⏱</span>
+                <span class="unit-name">Program Counter</span>
+                <span class="unit-type-tag">State Register</span>
+              </div>
+              <div class="arch-unit-block" data-component="imem">
+                <span class="unit-icon">💾</span>
+                <span class="unit-name">Instruction Memory & L1 I-Cache</span>
+                <span class="unit-type-tag">SRAM Array</span>
+              </div>
+              <div class="pipeline-latch-bar" data-component="if_id_reg">
+                &bull; IF / ID LATCH &bull;
+              </div>
+            </div>
+
+            <!-- ID Stage -->
+            <div class="arch-stage-column col-id">
+              <div class="arch-stage-col-header">2. INSTRUCTION DECODE</div>
+              <div class="arch-unit-block" data-component="control_unit">
+                <span class="unit-icon">🎛</span>
+                <span class="unit-name">Main Control Unit</span>
+                <span class="unit-type-tag">Decoder Logic</span>
+              </div>
+              <div class="arch-unit-block" data-component="reg_file">
+                <span class="unit-icon">🗄</span>
+                <span class="unit-name">Register File (32 GPRs)</span>
+                <span class="unit-type-tag">Dual Read Port</span>
+              </div>
+              <div class="arch-unit-block" data-component="hazard_unit">
+                <span class="unit-icon">⚠</span>
+                <span class="unit-name">Hazard Detection Unit</span>
+                <span class="unit-type-tag">Interlock Logic</span>
+              </div>
+              <div class="pipeline-latch-bar" data-component="id_ex_reg">
+                &bull; ID / EX LATCH &bull;
+              </div>
+            </div>
+
+            <!-- EX Stage -->
+            <div class="arch-stage-column col-ex">
+              <div class="arch-stage-col-header">3. EXECUTE</div>
+              <div class="arch-unit-block" data-component="alu">
+                <span class="unit-icon">🧮</span>
+                <span class="unit-name">ALU (Compute Core)</span>
+                <span class="unit-type-tag">Arithmetic / Logic</span>
+              </div>
+              <div class="arch-unit-block" data-component="forwarding_unit">
+                <span class="unit-icon">⚡</span>
+                <span class="unit-name">Data Forwarding Unit</span>
+                <span class="unit-type-tag">Bypass MUX Unit</span>
+              </div>
+              <div class="pipeline-latch-bar" data-component="ex_mem_reg">
+                &bull; EX / MEM LATCH &bull;
+              </div>
+            </div>
+
+            <!-- MEM Stage -->
+            <div class="arch-stage-column col-mem">
+              <div class="arch-stage-col-header">4. MEMORY ACCESS</div>
+              <div class="arch-unit-block" data-component="dmem_l1">
+                <span class="unit-icon">💾</span>
+                <span class="unit-name">Data Memory & L1 D-Cache</span>
+                <span class="unit-type-tag">Data SRAM</span>
+              </div>
+              <div class="arch-unit-block" data-component="l2_l3_cache">
+                <span class="unit-icon">🧠</span>
+                <span class="unit-name">L2 / L3 Unified Hierarchy</span>
+                <span class="unit-type-tag">Shared Cache</span>
+              </div>
+              <div class="pipeline-latch-bar" data-component="mem_wb_reg">
+                &bull; MEM / WB LATCH &bull;
+              </div>
+            </div>
+
+            <!-- WB Stage -->
+            <div class="arch-stage-column col-wb">
+              <div class="arch-stage-col-header">5. WRITE BACK</div>
+              <div class="arch-unit-block" data-component="reg_file">
+                <span class="unit-icon">🎯</span>
+                <span class="unit-name">Register Write Port</span>
+                <span class="unit-type-tag">Commit Latch</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 9: RESULTS & EXPORT -->
+      <!-- ================================================================= -->
+      <section id="view-results" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>MODULE 7: RESEARCH RESULTS & EXPORT</h2>
+            <p>Academic research summary report and export options (PDF / CSV).</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-cyber" id="btn-export-csv">📥 EXPORT CSV</button>
+            <button class="btn-cyber btn-cyber-emerald" id="btn-export-pdf">📄 EXPORT PDF</button>
+            <button class="btn-cyber btn-cyber-purple" id="btn-print-report">🖨 PRINT REPORT</button>
+          </div>
+        </div>
+
+        <div class="report-paper-container">
+          <div class="report-header">
+            <div class="report-title-group">
+              <h3>Design and Performance Analysis of a Pipelined Processor with a Multi-Level Cache Memory System</h3>
+              <div class="report-subtitle">Computer Architecture Performance Simulation Report</div>
+            </div>
+            <div class="cyber-badge badge-emerald">SIMULATION VERIFIED</div>
+          </div>
+
+          <!-- Section 1: Pipeline Summary -->
+          <div class="report-section">
+            <div class="report-section-title">⚡ 1. Pipeline Execution Summary</div>
+            <div class="report-grid-2">
+              <div class="detail-section-box">
+                <div>&bull; Total Instructions: <strong id="rep-inst-count">11</strong></div>
+                <div>&bull; Total Clock Cycles: <strong id="rep-total-cycles">15</strong></div>
+                <div>&bull; Cycles Per Instruction (CPI): <strong id="rep-cpi">1.36</strong></div>
+                <div>&bull; Total Execution Time: <strong id="rep-exec-time">6.0 ns</strong></div>
+              </div>
+              <div class="detail-section-box">
+                <div>&bull; Speedup vs Non-Pipelined: <strong id="rep-speedup" style="color:var(--cyber-cyan);">3.67x</strong></div>
+                <div>&bull; Pipeline Efficiency: <strong id="rep-efficiency">73.4%</strong></div>
+                <div>&bull; Hazard Stall Cycles: <strong id="rep-stalls">1</strong></div>
+                <div>&bull; Processor Throughput: <strong id="rep-throughput" style="color:#34d399;">1833 MIPS</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Cache Performance Summary -->
+          <div class="report-section">
+            <div class="report-section-title">🧠 2. Multi-Level Cache Memory Hierarchy Performance</div>
+            <div class="report-grid-2">
+              <div class="detail-section-box">
+                <div>&bull; L1 Cache Hit Rate: <strong id="rep-l1-hit" style="color:var(--cyber-cyan);">88.5%</strong></div>
+                <div>&bull; L2 Cache Hit Rate: <strong id="rep-l2-hit" style="color:#818cf8;">75.0%</strong></div>
+                <div>&bull; L3 Cache Hit Rate: <strong id="rep-l3-hit" style="color:#c084fc;">80.0%</strong></div>
+              </div>
+              <div class="detail-section-box">
+                <div>&bull; Global System Cache Hit Rate: <strong id="rep-global-hit" style="color:#34d399;">98.2%</strong></div>
+                <div>&bull; Average Memory Access Time (AMAT): <strong id="rep-amat" style="color:var(--cyber-emerald);">2.15 cycles</strong></div>
+                <div>&bull; DRAM Access Penalty: <strong>150 cycles</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Academic Conclusion -->
+          <div class="report-section">
+            <div class="report-section-title">📝 3. Architectural Conclusion & Findings</div>
+            <p style="color:var(--text-secondary); line-height:1.7; font-size:0.88rem;">
+              The experimental evaluation demonstrates that integrating a 5-stage classic RISC pipeline with data forwarding reduces execution CPI from 5.0 to 1.36, providing a <strong>3.67x speedup</strong>. Incorporating a 3-level hierarchical cache system (L1, L2, L3) effectively reduces the Average Memory Access Time (AMAT) from 150+ DRAM cycles down to <strong>2.15 cycles</strong>, drastically mitigating memory wall stall penalties and achieving near-peak processor throughput.
+            </p>
+          </div>
+
+          <div class="report-footer">
+            <span>Generated by Antigravity Interactive CPU Architecture Simulator</span>
+            <span>Platform Status: Operational &bull; Verified</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- VIEW 10: SETTINGS -->
+      <!-- ================================================================= -->
+      <section id="view-settings" class="app-view">
+        <div class="view-header">
+          <div class="view-title-group">
+            <h2>SIMULATION PLATFORM SETTINGS</h2>
+            <p>Clock timing parameters, cache latencies, and visualization preferences.</p>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding:28px; max-width:700px;">
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+              <label class="cyber-label">Processor Core Frequency (GHz)</label>
+              <input type="number" class="cyber-input" value="2.50" step="0.1" min="0.5" max="6.0">
+            </div>
+            <div>
+              <label class="cyber-label">Main Memory (DRAM) Access Latency (Cycles)</label>
+              <input type="number" class="cyber-input" value="150" min="50" max="500">
+            </div>
+            <div>
+              <label class="cyber-label">Default Cache Line Size (Bytes)</label>
+              <select class="cyber-select">
+                <option value="32">32 Bytes</option>
+                <option value="64" selected>64 Bytes (Industry Standard)</option>
+                <option value="128">128 Bytes</option>
+              </select>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+              <button class="btn-cyber btn-cyber-emerald" onclick="window.cyberAudio.playClick(); alert('Settings saved successfully!');">SAVE PREFERENCES</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ARCHITECTURE COMPONENT INSPECTION MODAL -->
+  <div class="cyber-modal" id="arch-inspector-modal">
+    <div class="cyber-modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(0,243,255,0.3); padding-bottom:14px; margin-bottom:18px;">
+        <div>
+          <h3 id="arch-modal-title" style="color:var(--cyber-cyan); font-size:1.3rem;">Component Name</h3>
+          <span id="arch-modal-stage" class="cyber-badge badge-purple" style="margin-top:4px;">Pipeline Stage</span>
+        </div>
+        <button class="btn-cyber btn-icon-only" id="btn-close-arch-modal" style="padding:4px 10px;">✕</button>
+      </div>
+
+      <div class="component-detail-grid">
+        <div class="detail-section-box">
+          <div class="detail-box-title">Component Type & Role</div>
+          <div class="detail-box-content" id="arch-modal-type">Type</div>
+        </div>
+        <div class="detail-section-box">
+          <div class="detail-box-title">Timing & Delay</div>
+          <div class="detail-box-content" id="arch-modal-timing">Timing</div>
+        </div>
+        <div class="detail-section-box" style="grid-column: span 2;">
+          <div class="detail-box-title">Hardware Function</div>
+          <div class="detail-box-content" id="arch-modal-function">Function description</div>
+        </div>
+        <div class="detail-section-box" style="grid-column: span 2;">
+          <div class="detail-box-title">Performance Impact</div>
+          <div class="detail-box-content" id="arch-modal-perf">Performance details</div>
+        </div>
+        <div class="detail-section-box" style="grid-column: span 2;">
+          <div class="detail-box-title">Control Signals & Datapath Flags</div>
+          <div class="detail-box-content" id="arch-modal-signals" style="font-family:var(--font-mono); color:#38bdf8;">Signals</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules Suite -->
+  <script src="js/circuit_canvas.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/pipeline_sim.js"></script>
+  <script src="js/gantt_chart.js"></script>
+  <script src="js/cache_sim.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/experiments.js"></script>
+  <script src="js/architecture.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
